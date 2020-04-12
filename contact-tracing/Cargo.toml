@@ -9,6 +9,7 @@ homepage = "https://github.com/mitsuhiko/proximity-tracing"
 repository = "https://github.com/mitsuhiko/proximity-tracing"
 documentation = "https://docs.rs/contact-tracing"
 keywords = ["covid-19", "contact-tracing"]
+readme = "README.md"
 
 [package.metadata.docs.rs]
 all-features = true
