@@ -28,4 +28,10 @@ lint:
 update-readme:
 	@cd contact-tracing; cargo readme | perl -p -e "s/\]\(([^\/]+)\)/](https:\/\/docs.rs\/contact-tracing\/latest\/contact_tracing\/\\1)/" > README.md
 
-.PHONY: all doc test cargotest format format-check lint update-readme
+server:
+	@cd backend-service; RUST_LOG=debug cargo run
+
+server-reload:
+	@cd backend-service; RUST_LOG=debug systemfd --no-pid -s http::5000 -- cargo watch -x run
+
+.PHONY: all doc test cargotest format format-check lint update-readme server server-reload

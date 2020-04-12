@@ -1,0 +1,27 @@
+[package]
+name = "backend-service"
+version = "0.1.0"
+authors = ["Armin Ronacher <armin.ronacher@active-4.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+warp = "0.2.2"
+futures = "0.3.4"
+tokio = { version = "0.2.13", features = ["macros"] }
+pretty_env_logger = "0.4.0"
+serde_json = "1.0.48"
+listenfd = "0.3.3"
+hyper = "0.13.4"
+serde = { version = "1.0.106", features = ["derive"] }
+chrono = "0.4.11"
+crc = "1.8.1"
+bytes = "0.5.4"
+http = "0.2.1"
+serde_cbor = "0.11.1"
+log = "0.4.8"
+sha2 = "0.8.1"
+hmac = "0.7.1"
+aes = "0.3.2"
+contact-tracing = { path = "../contact-tracing", features = ["serde"] }
