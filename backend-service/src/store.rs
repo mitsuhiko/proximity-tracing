@@ -13,7 +13,7 @@ use contact_tracing::{day_number_for_timestamp, DailyTracingKey};
 
 const DAYS_WINDOW: u32 = 21;
 
-/// Abstracts over an append only file of CCNs
+/// Abstracts over an append only file of daily tracing keys
 pub struct DailyTracingKeyStore {
     path: PathBuf,
     buckets: RwLock<BTreeMap<u32, HashSet<DailyTracingKey>>>,
@@ -28,7 +28,7 @@ impl fmt::Debug for DailyTracingKeyStore {
 }
 
 impl DailyTracingKeyStore {
-    /// Opens a ccn store
+    /// Opens a daily tracing key store
     pub fn open<P: AsRef<Path>>(p: P) -> Result<DailyTracingKeyStore, io::Error> {
         let path = p.as_ref().to_path_buf();
         fs::create_dir_all(&path)?;
@@ -135,7 +135,7 @@ impl DailyTracingKeyStore {
         day_number: u32,
         key: DailyTracingKey,
     ) -> Result<bool, io::Error> {
-        // check if this ccn has already been seen in the last 21 days
+        // check if this key has already been seen in the last 21 days
         if self.has_daily_tracing_key(key)? {
             return Ok(false);
         }
