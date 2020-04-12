@@ -1,0 +1,22 @@
+[package]
+name = "contact-tracing"
+version = "0.1.0"
+authors = ["Armin Ronacher <armin.ronacher@active-4.com>"]
+edition = "2018"
+description = "Implementation of the apple/google contact tracing protocol"
+license = "Apache-2.0"
+homepage = "https://github.com/mitsuhiko/proximity-tracing"
+repository = "https://github.com/mitsuhiko/proximity-tracing"
+documentation = "https://docs.rs/contact-tracing"
+keywords = ["covid-19", "contact-tracing"]
+
+[dependencies]
+derive_more = "0.99.5"
+base64 = "0.12.0"
+serde = { version = "1.0.106", features = ["derive"] }
+chrono = "0.4.11"
+sha2 = "0.8.1"
+hmac = "0.7.1"
+hkdf = "0.8.0"
+bytes = "0.5.4"
+rand = "0.7.3"
