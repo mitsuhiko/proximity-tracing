@@ -1,11 +1,9 @@
 use std::fmt;
-use std::str;
 
 use derive_more::{Display, Error};
 use rand::{thread_rng, RngCore};
-use serde::de::Deserializer;
-use serde::ser::Serializer;
-use serde::{Deserialize, Serialize};
+
+use crate::utils::Base64DebugFmtHelper;
 
 /// A compact representation of contact numbers.
 #[derive(Default, Copy, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
@@ -16,7 +14,7 @@ pub struct TracingKey {
 impl fmt::Debug for TracingKey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_tuple("TracingKey")
-            .field(&self.to_string())
+            .field(&Base64DebugFmtHelper(self))
             .finish()
     }
 }
@@ -51,53 +49,68 @@ impl TracingKey {
 #[display(fmt = "invalid tracing key")]
 pub struct InvalidTracingKey;
 
-impl str::FromStr for TracingKey {
-    type Err = InvalidTracingKey;
+#[cfg(feature = "base64")]
+mod base64_impl {
+    use super::*;
+    use std::{fmt, str};
 
-    fn from_str(value: &str) -> Result<TracingKey, InvalidTracingKey> {
-        let mut bytes = [0u8; 32];
-        if value.len() != 43 {
-            return Err(InvalidTracingKey);
+    impl str::FromStr for TracingKey {
+        type Err = InvalidTracingKey;
+
+        fn from_str(value: &str) -> Result<TracingKey, InvalidTracingKey> {
+            let mut bytes = [0u8; 32];
+            if value.len() != 43 {
+                return Err(InvalidTracingKey);
+            }
+            base64_::decode_config_slice(value, base64_::URL_SAFE_NO_PAD, &mut bytes[..])
+                .map_err(|_| InvalidTracingKey)?;
+            Ok(TracingKey { bytes })
         }
-        base64::decode_config_slice(value, base64::URL_SAFE_NO_PAD, &mut bytes[..])
-            .map_err(|_| InvalidTracingKey)?;
-        Ok(TracingKey { bytes })
     }
-}
 
-impl fmt::Display for TracingKey {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut buf = [0u8; 50];
-        let len = base64::encode_config_slice(self.bytes, base64::URL_SAFE_NO_PAD, &mut buf);
-        f.write_str(unsafe { std::str::from_utf8_unchecked(&buf[..len]) })
-    }
-}
-
-impl Serialize for TracingKey {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        if serializer.is_human_readable() {
-            serializer.serialize_str(&self.to_string())
-        } else {
-            serializer.serialize_bytes(self.as_bytes())
+    impl fmt::Display for TracingKey {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            let mut buf = [0u8; 50];
+            let len = base64_::encode_config_slice(self.bytes, base64_::URL_SAFE_NO_PAD, &mut buf);
+            f.write_str(unsafe { std::str::from_utf8_unchecked(&buf[..len]) })
         }
     }
 }
 
-impl<'de> Deserialize<'de> for TracingKey {
-    fn deserialize<D>(deserializer: D) -> Result<TracingKey, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        use serde::de::Error;
-        if deserializer.is_human_readable() {
-            let s = String::deserialize(deserializer).map_err(D::Error::custom)?;
-            s.parse().map_err(D::Error::custom)
-        } else {
-            let buf = Vec::<u8>::deserialize(deserializer).map_err(D::Error::custom)?;
-            TracingKey::from_bytes(&buf).map_err(D::Error::custom)
+#[cfg(feature = "serde")]
+mod serde_impl {
+    use super::*;
+
+    use serde_::de::Deserializer;
+    use serde_::ser::Serializer;
+    use serde_::{Deserialize, Serialize};
+
+    impl Serialize for TracingKey {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+        {
+            if serializer.is_human_readable() {
+                serializer.serialize_str(&self.to_string())
+            } else {
+                serializer.serialize_bytes(self.as_bytes())
+            }
+        }
+    }
+
+    impl<'de> Deserialize<'de> for TracingKey {
+        fn deserialize<D>(deserializer: D) -> Result<TracingKey, D::Error>
+        where
+            D: Deserializer<'de>,
+        {
+            use serde_::de::Error;
+            if deserializer.is_human_readable() {
+                let s = String::deserialize(deserializer).map_err(D::Error::custom)?;
+                s.parse().map_err(D::Error::custom)
+            } else {
+                let buf = Vec::<u8>::deserialize(deserializer).map_err(D::Error::custom)?;
+                TracingKey::from_bytes(&buf).map_err(D::Error::custom)
+            }
         }
     }
 }

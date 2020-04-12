@@ -9,8 +9,9 @@ doc:
 test: cargotest
 
 cargotest:
-	@rustup component add rustfmt 2> /dev/null
-	@cargo test --all
+	@cd contact-tracing; cargo test 
+	@cd contact-tracing; cargo check --no-default-features
+	@cd contact-tracing; cargo test --all-features
 
 format:
 	@rustup component add rustfmt 2> /dev/null
