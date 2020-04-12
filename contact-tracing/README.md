@@ -6,6 +6,12 @@ The version of this implementation is the [initial reference
 spec](https://covid19-static.cdn-apple.com/applications/covid19/current/static/contact-tracing/pdf/ContactTracing-CryptographySpecification.pdf)
 from April 2020.
 
+## Features
+
+* `chrono`: Adds timestamp operations to all structs (on by default)
+* `serde`: Adds serde support (implies `base64`)
+* `base64`: Adds base64 encoding/decoding through `Display` and `FromStr`
+
 ## Broadcast Example
 
 To broadcast one needs a tracing key and the rolling proximity identifier
@@ -36,3 +42,5 @@ for (tin, rpi) in dtkey.iter_rpis().enumerate() {
     // some reasonable window of the timestamp you captured.
 }
 ```
+
+License: Apache-2.0
