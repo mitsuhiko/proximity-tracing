@@ -151,7 +151,7 @@ impl DailyTracingKeyStore {
         let mut msg = BytesMut::new();
         msg.put_slice(key.as_bytes());
         msg.put_u32_le(crc32::checksum_ieee(key.as_bytes()));
-        file.write(&msg)?;
+        file.write_all(&msg)?;
         buckets
             .entry(day_number)
             .or_insert_with(Default::default)

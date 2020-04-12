@@ -12,6 +12,7 @@ cargotest:
 	@cd contact-tracing; cargo test 
 	@cd contact-tracing; cargo check --no-default-features
 	@cd contact-tracing; cargo test --all-features
+	@cd backend-service; cargo check
 
 format:
 	@rustup component add rustfmt 2> /dev/null

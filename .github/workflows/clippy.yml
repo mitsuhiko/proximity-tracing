@@ -1,4 +1,4 @@
-name: Rustfmt
+name: Lint
 
 on: [push]
 

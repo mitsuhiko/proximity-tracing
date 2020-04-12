@@ -2,13 +2,13 @@ use std::convert::Infallible;
 use std::sync::Arc;
 
 use chrono::{NaiveDateTime, TimeZone, Utc};
+use contact_tracing::DailyTracingKey;
 use hyper::{service::make_service_fn, Server};
 use serde::{Deserialize, Serialize};
 use warp::Filter;
-use contact_tracing::{DailyTracingKey};
 
-use crate::utils::{api_reply, response_format};
 use crate::store::DailyTracingKeyStore;
+use crate::utils::{api_reply, response_format};
 
 #[derive(Debug, Clone)]
 pub struct BackendState {
@@ -47,11 +47,13 @@ pub async fn serve() {
         let submit = warp::path("submit")
             .and(warp::body::json())
             .and(pass_state!())
-            .map(|data: DailyTracingKeyStoreRequest, state: Arc<BackendState>| {
-                for (day_num, key) in data.keys {
-                    state.store.add_daily_tracing_key(day_num, key).unwrap();
-                }
-            })
+            .map(
+                |data: DailyTracingKeyStoreRequest, state: Arc<BackendState>| {
+                    for (day_num, key) in data.keys {
+                        state.store.add_daily_tracing_key(day_num, key).unwrap();
+                    }
+                },
+            )
             .map(api_reply);
 
         let routes = response_format().and(fetch.or(submit));

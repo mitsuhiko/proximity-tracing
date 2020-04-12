@@ -38,11 +38,9 @@ where
         inner: match RESPONSE_FORMAT.with(|x| x.get()) {
             ResponseFormat::Json => ::serde_json::to_vec(&val).map_err(|err| {
                 log::error!("Invalid json serialization: {:?}", err);
-                ();
             }),
             ResponseFormat::Cbor => ::serde_cbor::to_vec(&val).map_err(|err| {
                 log::error!("Invalid cbor serialization: {:?}", err);
-                ();
             }),
         },
     }

@@ -1,6 +1,6 @@
 mod server;
-mod utils;
 mod store;
+mod utils;
 
 #[tokio::main]
 pub async fn main() {
